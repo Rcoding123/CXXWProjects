@@ -79,3 +79,76 @@ ERROR: Symbol must be uppercase letters only (1-6 chars).
 ---
 
 When you're done, paste your code here and I'll review it against those criteria. I'll tell you exactly what passes, what doesn't, and why — same standard as a real code review.
+
+
+Good submission. Compiles clean, logic works, structure is clear. Here's the full review:
+
+---
+
+**What passes:**
+
+- All 5 fields collected and validated correctly
+- Character-by-character symbol validation is exactly right — numbers, lowercase, and symbols each get their own error message
+- `cin.fail()` handling with `clear()` and `ignore()` is correct
+- LIMIT/MARKET price logic is correctly handled — you only call `getPrice()` when order type is LIMIT
+- `displayOrder` takes strings by const reference — correct instinct
+- Market order shows `@ MARKET` instead of a price — clean
+
+---
+
+**What doesn't pass:**
+
+**1. No `constexpr` for limits.**
+
+The spec required it. You have magic numbers scattered through the code:
+
+```cpp
+std::cin.ignore(10000, '\n');  // magic number
+if (quantity > 10000)          // magic number
+if (price > 999999.99)         // magic number
+```
+
+Should be at the top of the file:
+
+```cpp
+constexpr int MAX_QUANTITY = 10000;
+constexpr double MAX_PRICE = 999999.99;
+constexpr int MAX_SYMBOL_LENGTH = 6;
+constexpr int STREAM_IGNORE_LIMIT = 10000;
+```
+
+This is not style preference. In HFT code, magic numbers are a maintenance hazard. If max quantity changes, you want to change it in one place.
+
+**2. `getPrice()` rejects price of 0.0 but spec allows MARKET orders to pass 0.0.**
+
+You handled this correctly in `main` by not calling `getPrice()` for MARKET orders, but `getPrice()` itself enforces `price < 1.0` which would reject 0.0 anyway. Not a bug given your flow, but the validation boundary is slightly off — the spec says price > 0.0 for LIMIT, not price >= 1.0. A LIMIT order at $0.50 would be incorrectly rejected.
+
+Fix:
+
+```cpp
+if (price <= 0.0) {
+  std::cout << "Price must be greater than $0.00.\n";
+  continue;
+}
+```
+
+**3. `getOrderType()` prompt says `MARKET Or LIMIT` — inconsistent casing.** Minor but real. In production code prompts are part of the interface contract.
+
+**4. `price` in `main` is default-initialized to 0.0 for MARKET orders implicitly.**
+
+This works but it's implicit. A comment here would make intent clear:
+
+```cpp
+double price{0.0}; // 0.0 for MARKET orders, set by getPrice() for LIMIT
+```
+
+---
+
+**Verdict: does not pass at 90% yet — one hard requirement missing (constexpr).**
+
+Fix these three things:
+- Add `constexpr` for all numeric limits and use them everywhere
+- Fix the price floor from `< 1.0` to `<= 0.0`
+- Fix the prompt casing
+
+Resubmit and it passes. The core logic is solid — this is polish, not rework.
