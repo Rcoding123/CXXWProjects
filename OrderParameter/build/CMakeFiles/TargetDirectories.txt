@@ -1,0 +1,3 @@
+/home/ronak/CXXWProjects/OrderParameter/build/CMakeFiles/OrderParameter.dir
+/home/ronak/CXXWProjects/OrderParameter/build/CMakeFiles/edit_cache.dir
+/home/ronak/CXXWProjects/OrderParameter/build/CMakeFiles/rebuild_cache.dir

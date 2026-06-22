@@ -1,0 +1,81 @@
+92% — cleared. Here's your project.
+
+---
+
+**Week 1 Project: Order Parameter Validator**
+
+You are building a command-line tool that validates trading order parameters before they would be sent to an exchange. No trading logic, no market data — pure C++ foundations.
+
+---
+
+**What it does:**
+
+The program accepts order details from the user via `std::cin` and validates them. It prints either a confirmation or a specific error message.
+
+---
+
+**Fields to collect and validate:**
+
+- `symbol` — a string, 1 to 6 characters, uppercase letters only (e.g. `AAPL`, `ES`)
+- `side` — must be exactly `BUY` or `SELL`
+- `quantity` — a positive integer, greater than 0, no more than 10,000
+- `price` — a positive decimal, greater than 0.0, no more than 999999.99
+- `order_type` — must be exactly `LIMIT` or `MARKET`
+
+---
+
+**Rules:**
+
+- If `order_type` is `MARKET`, price must be 0.0 (market orders have no price)
+- If `order_type` is `LIMIT`, price must be greater than 0.0
+- All fields must be present and valid before the order is accepted
+- Print a specific error message for each validation failure — not just "invalid input"
+- If all fields pass, print a formatted order summary
+
+---
+
+**Example output (valid order):**
+
+```
+=== Order Validator ===
+Symbol: ES
+Side: BUY
+Quantity: 10
+Price: 4500.25
+Type: LIMIT
+
+Order accepted.
+--- Summary ---
+BUY 10 ES @ 4500.25 [LIMIT]
+```
+
+**Example output (invalid):**
+```
+=== Order Validator ===
+Symbol: es
+ERROR: Symbol must be uppercase letters only (1-6 chars).
+```
+
+---
+
+**Constraints — this is where the learning is:**
+
+- No classes, no structs yet — store everything in plain variables
+- No STL algorithms — validate manually with loops and conditionals
+- You must handle bad input types gracefully — if the user enters `abc` for quantity, don't crash
+- Use `const` for any value that doesn't change
+- Use `constexpr` for the limits (max quantity, max price, max symbol length)
+
+---
+
+**You pass this project if:**
+
+- All 5 validation rules work correctly including the LIMIT/MARKET price rule
+- Bad input (wrong type, out of range, wrong case) produces a clear error message
+- The code compiles cleanly with `-Wall -Wextra` and zero warnings
+- Every variable has the correct type — no using `int` where `double` belongs or vice versa
+- `constexpr` is used for at least the three numeric limits
+
+---
+
+When you're done, paste your code here and I'll review it against those criteria. I'll tell you exactly what passes, what doesn't, and why — same standard as a real code review.
