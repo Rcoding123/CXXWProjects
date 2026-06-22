@@ -1,6 +1,11 @@
 #include <iostream>
 #include <string>
 
+constexpr int MAX_QUANTITY = 10000;
+constexpr double MAX_PRICE = 999999.99;
+constexpr int MAX_SYMBOL_LENGTH = 6;
+const int STREAM_IGNORE_LIMIT = 10000;
+
 std::string getSymbol() {
   std::string symbol{};
 
@@ -8,7 +13,7 @@ std::string getSymbol() {
     std::cout << "Enter a symbol: ";
     std::cin >> symbol;
 
-    if (symbol.length() < 1 || symbol.length() > 6) {
+    if (symbol.length() < 1 || symbol.length() > MAX_SYMBOL_LENGTH) {
       std::cout << "Cannot be less than 1 or greater than 6" << '\n';
       continue;
     }
@@ -68,7 +73,7 @@ int getQuantity() {
     if (std::cin.fail()) {
       std::cout << "Invalid input. Enter a whole number only." << '\n';
       std::cin.clear();
-      std::cin.ignore(10000, '\n');
+      std::cin.ignore(STREAM_IGNORE_LIMIT, '\n');
       continue;
     }
 
@@ -77,7 +82,7 @@ int getQuantity() {
       continue;
     }
 
-    if (quantity > 10000) {
+    if (quantity > MAX_QUANTITY) {
       std::cout << "Quantity cannot be greater than 10000." << '\n';
       continue;
     }
@@ -95,16 +100,16 @@ double getPrice() {
     if (std::cin.fail()) {
       std::cout << "Invalid input. Enter a valid price only." << '\n';
       std::cin.clear();
-      std::cin.ignore(10000, '\n');
+      std::cin.ignore(STREAM_IGNORE_LIMIT, '\n');
       continue;
     }
 
-    if (price < 1.0) {
-      std::cout << "Price must be at least $1.00." << '\n';
+    if (price <= 0.0) {
+      std::cout << "Price must be greater than $0.00." << '\n';
       continue;
     }
 
-    if (price > 999999.99) {
+    if (price > MAX_PRICE) {
       std::cout << "Price cannot be greater than $999,999.99." << '\n';
       continue;
     }
@@ -117,7 +122,7 @@ std::string getOrderType() {
   std::string order_type{};
 
   while (true) {
-    std::cout << "Enter an order type (MARKET Or LIMIT): ";
+    std::cout << "Enter an order type (MARKET OR LIMIT): ";
     std::cin >> order_type;
 
     if (order_type == "MARKET" || order_type == "LIMIT") {
@@ -150,7 +155,7 @@ int main() {
   int quantity = getQuantity();
   std::string order_type = getOrderType();
 
-  double price{};
+  double price{0.0}; // 0.0 for MARKET orders, set by getPrice() for LIMIT
 
   if (order_type == "LIMIT") {
     price = getPrice();
