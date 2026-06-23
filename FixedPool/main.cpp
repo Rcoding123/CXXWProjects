@@ -2,15 +2,24 @@
 #include <cstdint>
 #include <iostream>
 
+enum class Side : std::int8_t { BUY, SELL };
+
+struct Order {
+  std::int64_t orderId;
+  std::int64_t price;
+  std::int32_t size;
+  Side side;
+};
+
 template <typename T, std::size_t N> class RawBuffer {
 private:
   T *data;
-  T *freelist;
-  std::size_t *top;
+  std::size_t *freelist;
+  std::size_t top;
 
 public:
-  RawBuffer() : data(new T[N]), freelist(new std::size_t[N]), top(freelist) {
-    for (int i{}; i < N; i++) {
+  RawBuffer() : data(new T[N]), freelist(new std::size_t[N]), top(N) {
+    for (std::size_t i{}; i < N; i++) {
       freelist[i] = i;
     }
   };
@@ -51,3 +60,20 @@ public:
     delete[] freelist;
   }
 };
+
+int main() {
+  auto myBuffer{RawBuffer<int, 100>()};
+  auto ptr1 = myBuffer.acquire();
+  std::cout << ptr1 << '\n';
+
+  auto ptr2 = myBuffer.acquire();
+  std::cout << ptr2 << '\n';
+
+  auto ptr3 = myBuffer.acquire();
+  std::cout << ptr3 << '\n';
+
+  myBuffer.release(ptr2);
+
+  auto ptr4 = myBuffer.acquire();
+  std::cout << ptr4 << '\n';
+}
