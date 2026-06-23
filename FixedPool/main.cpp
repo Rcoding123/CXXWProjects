@@ -4,7 +4,7 @@
 
 enum class Side : std::int8_t { BUY, SELL };
 
-struct Order {
+struct alignas(32) Order {
   std::int64_t orderId;
   std::int64_t price;
   std::int32_t size;
